@@ -1,0 +1,60 @@
+{
+	"name": "chat-app-yt",
+	"version": "1.0.0",
+	"description": "",
+	"main": "main.js",
+	"scripts": {
+		"server": "nodemon backend/server.js",
+		"client": "cd frontend && npm run dev",
+		"electron": "concurrently \"npm run server\" \"cd frontend && npm run electron:dev\"",
+		"build": "cd frontend && npm run electron:build",
+		"start": "concurrently \"npm run server\" \"npm run client\""
+	},
+	"type": "module",
+	"keywords": [],
+	"author": "robertsloan",
+	"license": "MIT",
+	"dependencies": {
+		"@langchain/anthropic": "^0.3.7",
+		"@langchain/community": "^0.3.10",
+		"@langchain/core": "^0.3.16",
+		"@langchain/langgraph": "^0.2.19",
+		"@langchain/openai": "^0.3.11",
+		"@langchain/textsplitters": "^0.1.0",
+		"bcryptjs": "^2.4.3",
+		"cheerio": "^1.0.0",
+		"cookie-parser": "^1.4.6",
+		"cors": "^2.8.5",
+		"csv-parse": "^5.5.6",
+		"csv-parser": "^3.0.0",
+		"date-fns": "^4.1.0",
+		"dotenv": "^16.4.5",
+		"express": "^4.21.1",
+		"express-async-handler": "^1.2.0",
+		"jsonwebtoken": "^9.0.2",
+		"mongoose": "^8.7.3",
+		"react-big-calendar": "^1.15.0",
+		"react-hot-toast": "^2.4.1",
+		"react-toastify": "^10.0.6",
+		"socket.io": "^4.7.4",
+		"zod": "^3.23.8"
+	},
+	"devDependencies": {
+		"concurrently": "^9.0.1",
+		"electron": "^33.0.2",
+		"electron-builder": "^25.1.8",
+		"nodemon": "^3.1.7",
+		"wait-on": "^8.0.1"
+	},
+	"build": {
+		"appId": "hdauto",
+		"files": [
+			"build/**/*",
+			"main.js"
+		],
+		"directories": {
+			"buildResources": "assets"
+		}
+	},
+	"proxy": "http://localhost:3001"
+}
