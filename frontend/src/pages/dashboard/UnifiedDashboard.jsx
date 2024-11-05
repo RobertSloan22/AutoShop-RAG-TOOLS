@@ -6,6 +6,7 @@ import Appointments from "../../components/appointments/Appointments";
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Sidebar from '../../components/layout/Sidebar';
 
 const UnifiedDashboard = () => {
     const navigate = useNavigate();
@@ -20,8 +21,15 @@ const UnifiedDashboard = () => {
     ];
 
     return (
+        <>
+ 
         <Container maxWidth="xl" className="py-6">
             {/* Top Stats Row */}
+            <Grid item xs={12}>
+        <div className="flex justify-center items-center h-[10vh] font-bold text-3xl text-white">
+        <h1>DTC Dashboard</h1>
+        </div>
+        </Grid>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 {stats.map((stat, index) => (
                     <div key={index} className="bg-gray-800 rounded-lg p-6">
@@ -46,8 +54,7 @@ const UnifiedDashboard = () => {
                     </div>
 
                     {/* DTC Query Interface */}
-              
-                        <DTCQueryInterface />
+                    <DTCQueryInterface />
                 </Grid>
 
                 {/* Right Column */}
@@ -88,10 +95,15 @@ const UnifiedDashboard = () => {
                                 </div>
                             ))}
                         </div>
+                        
                     </div>
+                    
                 </Grid>
+               
             </Grid>
-        </Container>
+            
+  </Container>
+        </>
     );
 };
 

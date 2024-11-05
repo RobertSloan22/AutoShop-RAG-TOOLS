@@ -121,7 +121,7 @@ const Activant = () => {
 
     return (
         <>
-                                <AppointmentList/>
+       <AppointmentList/>
 
                       <MessageContainer />
                         <Appointments/>

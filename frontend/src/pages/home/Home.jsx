@@ -1,25 +1,28 @@
 import MessageContainer from "../../components/messages/MessageContainer";
-import Sidebar from "../../components/sidebar/Sidebar";
-import { Link } from "react-router-dom";
-import Invoice from "../invoice/Invoice.jsx"
 import Appointments from "../../components/appointments/Appointments";
-import InvoiceModal from "../../components/invoice/InvoiceModal";
-import CustomerSearch from "../../components/customers/CustomerSearch";
-import DTCQueryInterface from "../../components/dtc/DTCQueryInterface";
+import NewCustomerForm from "../../components/customers/NewCustomerForm";
 import InvoiceList from "../invoice/Invoice";
-import NewInvoice from "../invoice/NewInvoice";
-
+import { Container } from "@mui/material";
+import VehicleDetailsModal from "../../components/vehicle/VehicleDetailsModal";
+// from components/customers/NewCustomerForm
+import CustomerForm from '../../components/customers/CustomerForm';
+import EditCustomer from '../../components/customers/EditCustomer';
+import NewCustomer from '../../components/customers/NewCustomer';
 const Home = () => {
-	return (
+    return (
 		<>
-	
-
-			
-					<InvoiceList/>
-			<MessageContainer />
-					<Appointments/>
+        <Container maxWidth="xl" className="py-6">
+            <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+			 <NewCustomerForm />
+				
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                </div>
+            </div>
+        </Container>
 		</>
-	);
+    );
 };
 
 export default Home;

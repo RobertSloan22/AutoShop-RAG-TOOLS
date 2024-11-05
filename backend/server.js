@@ -11,7 +11,7 @@ import messageRoutes from "./routes/message.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import invoiceRoutes from "./routes/invoice.routes.js";
 import appointmentRoutes from "./routes/appointmentRoutes.js";
-import customerRoutes from './routes/customer.routes.js';
+import customerRoutes from './routes/customerRoutes.js';
 import dtcRoutes from './routes/dtc.routes.js';
 import vehicleRoutes from "./routes/vehicle.routes.js";
 import serviceRoutes from "./routes/service.routes.js";

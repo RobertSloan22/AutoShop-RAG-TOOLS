@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useVehicle } from '../../context/VehicleContext';
+import { VehicleSearch } from '../vehicle/VehicleSearch';
 
 export const InvoiceForm = ({ initialData, onSubmit, isReadOnly = false }) => {
     const [formData, setFormData] = useState({
@@ -54,6 +55,14 @@ export const InvoiceForm = ({ initialData, onSubmit, isReadOnly = false }) => {
             engine: vehicleData.engine,
             transmission: vehicleData.transmission
         });
+
+        setFormData(prev => ({
+            ...prev,
+            vehicleType: `${vehicleData.year} ${vehicleData.make} ${vehicleData.model}`,
+            vehicleVin: vehicleData.vin,
+            vehicleEngine: vehicleData.engine,
+            vehicleTransmission: vehicleData.transmission
+        }));
     };
 
     return (
@@ -124,29 +133,15 @@ export const InvoiceForm = ({ initialData, onSubmit, isReadOnly = false }) => {
                 {/* Vehicle Information Section */}
                 <div className="bg-gray-800 p-6 rounded-lg">
                     <h2 className="text-xl font-semibold text-white mb-4">Vehicle Information</h2>
+                    <div className="mb-4">
+                        <VehicleSearch onSelect={handleVehicleSelect} disabled={isReadOnly} />
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input
-                            type="text"
-                            name="vehicleType"
-                            placeholder="Vehicle Type"
-                            value={formData.vehicleType}
-                            onChange={handleChange}
-                            className="w-full p-2 border rounded bg-gray-700 border-gray-600 text-white"
-                            required
-                        />
                         <input
                             type="text"
                             name="vehicleNumber"
                             placeholder="Vehicle Number"
                             value={formData.vehicleNumber}
-                            onChange={handleChange}
-                            className="w-full p-2 border rounded bg-gray-700 border-gray-600 text-white"
-                        />
-                        <input
-                            type="text"
-                            name="vehicleVin"
-                            placeholder="VIN"
-                            value={formData.vehicleVin}
                             onChange={handleChange}
                             className="w-full p-2 border rounded bg-gray-700 border-gray-600 text-white"
                         />

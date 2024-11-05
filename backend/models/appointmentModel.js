@@ -13,9 +13,21 @@ const appointmentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  vehicleMake: {
+    type: String,
+    required: false,
+  },
+  vehicleYear: {
+    type: Number,
+    required: false,
+  },
+  vehicleModel: {
+    type: String,
+    required: false,
+  },
   complaint: {
     type: String,
-    required: true,
+    required: false,
   },
   notes: {
     type: String,

@@ -11,11 +11,11 @@ const appointmentSchema = new mongoose.Schema({
   },
   end: {
     type: Date,
-    required: true
+    required: false
   },
   description: {
     type: String,
-    required: true
+    required: false
   },
   customerName: {
     type: String,
@@ -23,7 +23,7 @@ const appointmentSchema = new mongoose.Schema({
   },
   phoneNumber: {
     type: String,
-    required: true
+    required: false
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,

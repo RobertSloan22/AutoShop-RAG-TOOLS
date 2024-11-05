@@ -17,7 +17,7 @@ const serviceRecordSchema = new mongoose.Schema({
     },
     serviceType: {
         type: String,
-        enum: ['maintenance', 'repair', 'diagnostic', 'inspection'],
+        enum: ['maintenance', 'repair', 'diagnostic', 'inspection', 'oil-change', 'tire-rotation', 'detailing', 'Coolantflush', 'transmission-flush', 'Air-conditioning', 'suspension', 'performance', 'electrical', 'other'],
         required: true
     },
     mileage: Number,
@@ -27,7 +27,7 @@ const serviceRecordSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['scheduled', 'in-progress', 'completed', 'waiting-parts', 'cancelled'],
+        enum: ['scheduled', 'in-progress', 'completed', 'diagnosed', 'waiting-for-approval', 'waiting-parts', 'cancelled'],
         default: 'scheduled'
     },
     parts: [{
@@ -53,7 +53,7 @@ const serviceRecordSchema = new mongoose.Schema({
         service: String,
         priority: {
             type: String,
-            enum: ['high', 'medium', 'low']
+            enum: ['high', 'medium', 'low', 'needed-now']
         },
         estimatedCost: Number
     }]

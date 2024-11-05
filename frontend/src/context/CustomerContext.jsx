@@ -1,48 +1,34 @@
-// Create a new Context for customers 
-
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 const CustomerContext = createContext();
 
 export const CustomerProvider = ({ children }) => {
-    const [currentCustomer, setCurrentCustomer] = useState(null);
-    const [currentVehicle, setCurrentVehicle] = useState(null);
-    const [searchResults, setSearchResults] = useState([]);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [customerData, setCustomerData] = useState({});
 
-    const selectCustomerAndVehicle = (customer, vehicle) => {
-        setCurrentCustomer(customer);
-        setCurrentVehicle(vehicle);
-    };
-
-    const clearSelection = () => {
-        setCurrentCustomer(null);
-        setCurrentVehicle(null);
-    };
-
-    const searchCustomers = async (searchTerm) => {
-        try {
-            const response = await fetch(`/api/customers/search?term=${searchTerm}`);
-            const data = await response.json();
-            setSearchResults(data);
-        } catch (error) {
-            console.error('Error searching customers:', error);
-        }
+    const updateCustomerData = (data) => {
+        setCustomerData(prevData => ({
+            ...prevData,
+            ...data
+        }));
     };
 
     return (
-        <CustomerContext.Provider value={{ 
-            currentCustomer, 
-            currentVehicle,
-            searchResults,
-            selectCustomerAndVehicle,
-            clearSelection,
-            searchCustomers
+        <CustomerContext.Provider value={{
+            selectedCustomer,
+            setSelectedCustomer,
+            customerData,
+            updateCustomerData
         }}>
             {children}
         </CustomerContext.Provider>
     );
 };
 
-export const useCustomer = () => useContext(CustomerContext);
-
-
+export const useCustomer = () => {
+    const context = useContext(CustomerContext);
+    if (!context) {
+        throw new Error('useCustomer must be used within a CustomerProvider');
+    }
+    return context;
+};

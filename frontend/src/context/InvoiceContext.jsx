@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from '../utils/axiosConfig';
+import api from '../utils/axiosConfig';
 
 const InvoiceContext = createContext();
 
@@ -11,12 +11,7 @@ export const InvoiceProvider = ({ children }) => {
 
     const fetchInvoices = async () => {
         try {
-            const res = await axios.get('/api/invoices/all', {
-                baseURL: process.env.API_URL || 'http://localhost:5000',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            const res = await api.get('/api/invoices/all');
             setInvoices(res.data);
         } catch (error) {
             console.error('Error fetching invoices:', error);

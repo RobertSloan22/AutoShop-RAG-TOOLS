@@ -1,91 +1,101 @@
 import React, { useState } from 'react';
-import CustomerDetails from './CustomerDetails';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import axiosInstance from '../../utils/axiosConfig';
+import { useNavigate } from 'react-router-dom';
+import CustomerDetailsModal from './CustomerDetailsModal';
 
-const CustomerSearch = () => {
+const CustomerSearch = ({ onCustomerSelect }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
-    const [showResults, setShowResults] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const navigate = useNavigate();
 
-    const handleSearch = async (e) => {
-        const term = e.target.value;
-        setSearchTerm(term);
-        
-        if (term.length >= 2) {
-            setLoading(true);
-            try {
-                console.log('Searching with URL:', `/api/customers/search?term=${term}`);
-                
-                const response = await axios.get(`/api/customers/search?term=${term}`);
-                console.log('Search response:', response.data);
-                
-                setSearchResults(response.data);
-                setShowResults(true);
-            } catch (error) {
-                console.error('Search error details:', {
-                    message: error.message,
-                    response: error.response?.data,
-                    status: error.response?.status
-                });
-            } finally {
-                setLoading(false);
-            }
-        } else {
+    const handleSearch = async (value) => {
+        setSearchTerm(value);
+        if (value.length < 2) {
             setSearchResults([]);
-            setShowResults(false);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await axios.get(`/api/customers/search`, {
+                params: { term: value }
+            });
+            setSearchResults(response.data);
+        } catch (error) {
+            console.error('Search error:', error);
+            toast.error('Error searching customers');
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleCustomerClick = (customer) => {
         setSelectedCustomer(customer);
-        setShowResults(false);
+        setShowDetailsModal(true);
+        setSearchResults([]);
         setSearchTerm('');
+    };
+
+    const handleCloseModal = () => {
+        setShowDetailsModal(false);
+        setSelectedCustomer(null);
+    };
+
+    const handleEditCustomer = () => {
+        if (selectedCustomer && onCustomerSelect) {
+            onCustomerSelect(selectedCustomer);
+            handleCloseModal();
+        }
     };
 
     return (
         <div className="relative">
-            <div className="flex items-center">
-                <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    placeholder="Search customers..."
-                    className="bg-gray-700 text-white px-4 py-2 rounded w-64"
-                />
-                {loading && (
-                    <div className="ml-2">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    </div>
-                )}
-            </div>
-            
-            {showResults && searchResults.length > 0 && (
-                <div className="absolute top-full mt-1 w-full bg-gray-800 rounded-lg shadow-lg z-50">
-                    {searchResults.map(customer => (
+            <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Search customers..."
+                className="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-white"
+            />
+
+            {loading && (
+                <div className="absolute right-3 top-3">
+                    <div className="animate-spin h-4 w-4 border-2 border-blue-500 rounded-full border-t-transparent"></div>
+                </div>
+            )}
+
+            {searchResults.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg max-h-60 overflow-auto">
+                    {searchResults.map((customer) => (
                         <div
                             key={customer._id}
                             onClick={() => handleCustomerClick(customer)}
-                            className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-white"
+                            className="p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-700 last:border-0"
                         >
-                            {customer.firstName} {customer.lastName}
+                            <div className="text-white font-medium">
+                                {customer.firstName} {customer.lastName}
+                            </div>
+                            {customer.email && (
+                                <div className="text-gray-400 text-sm">{customer.email}</div>
+                            )}
+                            {customer.phoneNumber && (
+                                <div className="text-gray-400 text-sm">{customer.phoneNumber}</div>
+                            )}
                         </div>
                     ))}
                 </div>
             )}
 
-            {showResults && searchResults.length === 0 && searchTerm.length >= 2 && (
-                <div className="absolute top-full mt-1 w-full bg-gray-800 rounded-lg shadow-lg z-50 p-4 text-gray-400">
-                    No customers found
-                </div>
-            )}
-
-            {selectedCustomer && (
-                <CustomerDetails
+            {showDetailsModal && (
+                <CustomerDetailsModal
                     customer={selectedCustomer}
-                    onClose={() => setSelectedCustomer(null)}
+                    onClose={handleCloseModal}
+                    onEdit={handleEditCustomer}
                 />
             )}
         </div>

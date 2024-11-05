@@ -12,22 +12,56 @@ const vehicleSchema = new mongoose.Schema({
     },
     make: {
         type: String,
+        enum: ['bmw', 'mercedes', 'audi', 'volkswagen', 'ford', 'chevrolet', 'chrysler', 'dodge', 'jeep', 'volvo', 'saab', 'porsche', 'lexus', 'mercury', 'buick', 'acura', 'lincoln', 'pontiac', 'honda', 'toyota', 'nissan', 'hyundai', 'kia', 'other'],
         required: true
     },
     model: {
         type: String,
         required: true
     },
+    trim: {
+        type: String,
+        default: null
+    },
     vin: {
         type: String,
         unique: true,
         sparse: true
     },
-    licensePlate: String,
+    licensePlate: {
+        type: String,
+        default: null
+    },
     color: String,
     mileage: Number,
-    engine: String,
-    transmission: String,
+    engine: {
+        type: String,
+        enum: ['4-cylinder', '6-cylinder', '8-cylinder', 'electric'],
+        required: true
+    },
+    turbooharged: {
+        type: Boolean,
+        default: false,
+        required: true
+    },
+    transmission: {
+        type: String,
+        enum: ['automatic', 'manual', 'cvt'],
+        required: true
+    },
+    fuelType: {
+        type: String,
+        enum: ['gasoline', 'diesel', 'electric', 'hybrid'],
+        required: true
+    },
+    isAWD: {
+        type: Boolean,
+        default: false
+    },
+    is4x4: {
+        type: Boolean,
+        default: false
+    },
     notes: String,
     maintenanceHistory: [{
         type: mongoose.Schema.Types.ObjectId,

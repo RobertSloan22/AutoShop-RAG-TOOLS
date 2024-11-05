@@ -60,8 +60,8 @@ const Login = () => {
                 <p className="mt-4 text-center text-gray-400">
                     Don't have an account?{' '}
                     <Link to="/signup" className="text-blue-400 hover:text-blue-300">
-                        Sign up
-                    </Link>
+    Sign up
+</Link>
                 </p>
             </div>
             <Toaster position="top-center" reverseOrder={false} />

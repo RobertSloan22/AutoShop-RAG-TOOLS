@@ -1,9 +1,69 @@
+import Customer from "../models/customer.model.js";
+import Vehicle from "../models/vehicle.model.js";
 import Invoice from "../models/invoice.model.js";
 
 // Create a new invoice
 export const createInvoice = async (req, res) => {
     try {
-        const newInvoice = new Invoice(req.body);
+        // First, try to find existing customer by email
+        let customer = await Customer.findOne({ email: req.body.customerEmail });
+        
+        if (customer) {
+            // Update customer information if needed
+            customer = await Customer.findByIdAndUpdate(
+                customer._id,
+                {
+                    phoneNumber: req.body.phoneNumber || customer.phoneNumber,
+                    address: req.body.address || customer.address,
+                    city: req.body.city || customer.city,
+                    zipCode: req.body.zipCode || customer.zipCode
+                },
+                { new: true }
+            );
+        } else {
+            // Create new customer if doesn't exist
+            customer = new Customer({
+                firstName: req.body.customerName.split(' ')[0],
+                lastName: req.body.customerName.split(' ').slice(1).join(' '),
+                email: req.body.customerEmail,
+                phoneNumber: req.body.phoneNumber,
+                address: req.body.address,
+                city: req.body.city,
+                zipCode: req.body.zipCode
+            });
+            await customer.save();
+        }
+
+        // Check if vehicle exists for this customer
+        let vehicle = await Vehicle.findOne({ 
+            customerId: customer._id,
+            vin: req.body.vehicleVin 
+        });
+
+        if (!vehicle) {
+            // Create new vehicle
+            vehicle = new Vehicle({
+                customerId: customer._id,
+                make: req.body.vehicleType.split(' ')[1], // Assuming format: "YEAR MAKE MODEL"
+                model: req.body.vehicleType.split(' ')[2],
+                year: parseInt(req.body.vehicleType.split(' ')[0]),
+                vin: req.body.vehicleVin,
+                color: req.body.vehicleColor,
+                mileage: req.body.vehicleMileage,
+                engine: req.body.vehicleEngine,
+                transmission: req.body.vehicleTransmission,
+                fuelType: req.body.vehicleFuelType
+            });
+            await vehicle.save();
+        }
+
+        // Create the invoice with references to customer and vehicle
+        const newInvoice = new Invoice({
+            ...req.body,
+            customerId: customer._id,
+            vehicleId: vehicle._id
+        });
+
         const savedInvoice = await newInvoice.save();
         res.status(201).json(savedInvoice);
     } catch (error) {
@@ -72,8 +132,8 @@ export const deleteInvoice = async (req, res) => {
 // Get invoices by customer email
 export const getInvoicesByCustomer = async (req, res) => {
     try {
-        const customerEmail = req.params.email;
-        const invoices = await Invoice.find({ customerEmail })
+        const invoices = await Invoice.find({ customerId: req.params.id })
+            .populate('vehicleId')
             .sort({ createdAt: -1 });
         res.status(200).json(invoices);
     } catch (error) {

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
+import { vehicleOptions, engineOptions, colorOptions } from '../../config/vehicleOptions';
 
 const NewCustomerForm = ({ onSuccess }) => {
     const navigate = useNavigate();
@@ -17,21 +18,27 @@ const NewCustomerForm = ({ onSuccess }) => {
         zipCode: '',
         
         // Vehicle Information
-        vehicleType: '',
-        vehicleNumber: '',
+        year: '',
+        make: '',
+        model: '',
+        trim: '',
         vin: '',
+        licensePlate: '',
         color: '',
         mileage: '',
         engine: '',
         transmission: '',
         fuelType: '',
+        isAWD: false,
+        is4x4: false,
+        notes: ''
     });
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, type, checked, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: type === 'checkbox' ? checked : value
         }));
     };
 
@@ -40,13 +47,39 @@ const NewCustomerForm = ({ onSuccess }) => {
         setLoading(true);
         
         try {
-            const response = await axios.post('/api/customers', formData);
-            if (response.data) {
-                toast.success('Customer created successfully!');
-                if (onSuccess) {
-                    onSuccess(response.data);
-                }
+            const customerResponse = await axiosInstance.post('/customers', {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phoneNumber: formData.phoneNumber,
+                address: formData.address,
+                city: formData.city,
+                zipCode: formData.zipCode
+            });
+
+            const vehicleResponse = await axiosInstance.post('/vehicles', {
+                customerId: customerResponse.data._id,
+                year: parseInt(formData.year),
+                make: formData.make,
+                model: formData.model,
+                trim: formData.trim,
+                vin: formData.vin,
+                licensePlate: formData.licensePlate,
+                color: formData.color,
+                mileage: parseInt(formData.mileage),
+                engine: formData.engine,
+                transmission: formData.transmission,
+                fuelType: formData.fuelType,
+                isAWD: formData.isAWD,
+                is4x4: formData.is4x4,
+                notes: formData.notes
+            });
+
+            toast.success('Customer and vehicle created successfully!');
+            if (onSuccess) {
+                onSuccess({ ...customerResponse.data, vehicle: vehicleResponse.data });
             }
+            navigate(`/customers/${customerResponse.data._id}`);
         } catch (error) {
             console.error('Error creating customer:', error);
             const errorMessage = error.response?.data?.error || 
@@ -58,7 +91,14 @@ const NewCustomerForm = ({ onSuccess }) => {
         }
     };
 
+    const getModelOptions = (make) => {
+        return make && vehicleOptions[make.toLowerCase()] 
+            ? vehicleOptions[make.toLowerCase()].models 
+            : [];
+    };
+
     return (
+        <>
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Customer Information */}
             <div className="space-y-4">
@@ -135,22 +175,50 @@ const NewCustomerForm = ({ onSuccess }) => {
                 <h3 className="text-lg font-medium text-white">Vehicle Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
-                        type="text"
-                        name="vehicleType"
-                        placeholder="Vehicle Type"
-                        value={formData.vehicleType}
+                        type="number"
+                        name="year"
+                        placeholder="Year"
+                        value={formData.year}
                         onChange={handleChange}
                         className="w-full p-2 bg-gray-700 rounded text-white"
                         required
                     />
-                    <input
-                        type="text"
-                        name="vehicleNumber"
-                        placeholder="Vehicle Number"
-                        value={formData.vehicleNumber}
+                    <select
+                        name="make"
+                        value={formData.make}
                         onChange={handleChange}
                         className="w-full p-2 bg-gray-700 rounded text-white"
                         required
+                    >
+                        <option value="">Select Make</option>
+                        {Object.entries(vehicleOptions).map(([key, value]) => (
+                            <option key={key} value={key}>
+                                {value.name}
+                            </option>
+                        ))}
+                    </select>
+                    <select
+                        name="model"
+                        value={formData.model}
+                        onChange={handleChange}
+                        className="w-full p-2 bg-gray-700 rounded text-white"
+                        required
+                        disabled={!formData.make}
+                    >
+                        <option value="">Select Model</option>
+                        {getModelOptions(formData.make).map(model => (
+                            <option key={model} value={model}>
+                                {model}
+                            </option>
+                        ))}
+                    </select>
+                    <input
+                        type="text"
+                        name="trim"
+                        placeholder="Trim Package"
+                        value={formData.trim}
+                        onChange={handleChange}
+                        className="w-full p-2 bg-gray-700 rounded text-white"
                     />
                     <input
                         type="text"
@@ -163,13 +231,26 @@ const NewCustomerForm = ({ onSuccess }) => {
                     />
                     <input
                         type="text"
+                        name="licensePlate"
+                        placeholder="License Plate"
+                        value={formData.licensePlate}
+                        onChange={handleChange}
+                        className="w-full p-2 bg-gray-700 rounded text-white"
+                    />
+                    <select
                         name="color"
-                        placeholder="Color"
                         value={formData.color}
                         onChange={handleChange}
                         className="w-full p-2 bg-gray-700 rounded text-white"
                         required
-                    />
+                    >
+                        <option value="">Select Color</option>
+                        {colorOptions.map(color => (
+                            <option key={color} value={color}>
+                                {color.charAt(0).toUpperCase() + color.slice(1)}
+                            </option>
+                        ))}
+                    </select>
                     <input
                         type="number"
                         name="mileage"
@@ -179,15 +260,20 @@ const NewCustomerForm = ({ onSuccess }) => {
                         className="w-full p-2 bg-gray-700 rounded text-white"
                         required
                     />
-                    <input
-                        type="text"
+                    <select
                         name="engine"
-                        placeholder="Engine"
                         value={formData.engine}
                         onChange={handleChange}
                         className="w-full p-2 bg-gray-700 rounded text-white"
                         required
-                    />
+                    >
+                        <option value="">Select Engine</option>
+                        {engineOptions.map(engine => (
+                            <option key={engine} value={engine}>
+                                {engine}
+                            </option>
+                        ))}
+                    </select>
                     <select
                         name="transmission"
                         value={formData.transmission}
@@ -213,6 +299,36 @@ const NewCustomerForm = ({ onSuccess }) => {
                         <option value="electric">Electric</option>
                         <option value="hybrid">Hybrid</option>
                     </select>
+                    <div className="col-span-2 flex gap-4">
+                        <label className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                name="isAWD"
+                                checked={formData.isAWD}
+                                onChange={handleChange}
+                                className="form-checkbox text-blue-600"
+                            />
+                            <span className="text-white">AWD</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                name="is4x4"
+                                checked={formData.is4x4}
+                                onChange={handleChange}
+                                className="form-checkbox text-blue-600"
+                            />
+                            <span className="text-white">4x4</span>
+                        </label>
+                    </div>
+                    <textarea
+                        name="notes"
+                        placeholder="Notes"
+                        value={formData.notes}
+                        onChange={handleChange}
+                        className="col-span-2 w-full p-2 bg-gray-700 rounded text-white"
+                        rows="3"
+                    />
                 </div>
             </div>
 
@@ -226,6 +342,7 @@ const NewCustomerForm = ({ onSuccess }) => {
                 {loading ? 'Creating...' : 'Create Customer'}
             </button>
         </form>
+        </>
     );
 };
 

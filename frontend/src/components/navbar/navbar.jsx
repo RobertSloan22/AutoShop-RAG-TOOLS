@@ -2,10 +2,12 @@ import React from 'react';
 import { Link } from "react-router-dom";
 import CustomerSearch from "../customers/CustomerSearch";
 import VehicleIndicator from "./VehicleIndicator";
+import DTCQueryInterface from '../dtc/DTCQueryInterface';
 import "./nav.css";
 
 const Navbar = () => {
 	return (
+		<>
 		<nav className="bg-gray-800 p-4">
 			<div className="flex items-center justify-between">
 				<Link to="/" className="text-white font-bold">
@@ -22,18 +24,20 @@ const Navbar = () => {
 					<CustomerSearch />
 					<div className="space-x-4">
 						<Link to="/unified-dashboard" className="text-gray-300 hover:text-white">
-							Dashboard
+							Home Dashboard
 						</Link>
-						<Link to="/profile" className="text-gray-300 hover:text-white">
-							DTC-Query
-						</Link>
+						
 						<Link to="/activant" className="text-gray-300 hover:text-white">
-							Activant
+							Appointments
+						</Link>
+						<Link to="/dtc-query-interface" className="text-gray-300 hover:text-white">
+							DTC-Query-Interface
 						</Link>
 					</div>
 				</div>
 			</div>
 		</nav>
+		</>
 	);
 };
 

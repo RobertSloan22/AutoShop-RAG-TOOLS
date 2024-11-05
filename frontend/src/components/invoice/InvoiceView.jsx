@@ -19,4 +19,6 @@ const InvoiceView = ({ invoice }) => {
             </button>
         </div>
     );
-}; 
+};
+
+export default InvoiceView; 
