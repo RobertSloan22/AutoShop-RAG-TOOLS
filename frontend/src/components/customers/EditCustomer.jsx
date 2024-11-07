@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosConfig';
-import { toast } from 'react-toastify';
-import CustomerForm from './CustomerForm';
+import { toast } from 'react-hot-toast';
+import NewCustomerForm from './NewCustomerForm';
 
 const EditCustomer = () => {
     const { id } = useParams();
@@ -15,63 +15,25 @@ const EditCustomer = () => {
         const fetchCustomerData = async () => {
             try {
                 setLoading(true);
-                setError(null);
-
-                // Fetch customer details
                 const customerRes = await axiosInstance.get(`/customers/${id}`);
-                
-                // Attempt to fetch vehicle data, but don't fail if none exists
-                let vehicleData = {};
-                try {
-                    const vehiclesRes = await axiosInstance.get(`/customers/${id}/vehicles`);
-                    if (vehiclesRes.data && vehiclesRes.data.length > 0) {
-                        vehicleData = vehiclesRes.data[0];
-                    }
-                } catch (vehicleError) {
-                    console.log('No vehicle data found or error fetching vehicles');
-                }
+                const vehiclesRes = await axiosInstance.get(`/customers/${id}/vehicles`);
+                const vehicleData = vehiclesRes.data.length > 0 ? vehiclesRes.data[0] : {};
 
-                // Initialize all fields with empty values first
-                const initialData = {
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    phoneNumber: '',
-                    address: '',
-                    city: '',
-                    zipCode: '',
-                    notes: '',
-                    year: '',
-                    make: '',
-                    model: '',
-                    trim: '',
-                    vin: '',
-                    licensePlate: '',
-                    color: '',
-                    mileage: '',
-                    engine: '',
-                    transmission: '',
-                    fuelType: '',
-                    isAWD: false,
-                    is4x4: false,
-                    vehicleNotes: ''
-                };
+                console.log('Customer Data:', customerRes.data);
+                console.log('Vehicle Data:', vehicleData);
 
-                // Then overlay with any existing data
                 const combinedData = {
-                    ...initialData,
                     ...customerRes.data,
                     ...vehicleData,
                     vehicleNotes: vehicleData.notes || ''
                 };
 
+                console.log('Combined Data:', combinedData);
                 setCustomerData(combinedData);
-                console.log('Loaded customer data:', combinedData);
-
             } catch (error) {
                 console.error('Error fetching customer:', error);
-                setError(error.response?.data?.message || 'Error loading customer data');
-                toast.error('Failed to load customer information');
+                setError('Failed to load customer information');
+                toast.error('Error loading customer data');
             } finally {
                 setLoading(false);
             }
@@ -82,99 +44,20 @@ const EditCustomer = () => {
         }
     }, [id]);
 
-    const handleSubmit = async (formData) => {
-        try {
-            setLoading(true);
-            
-            // Split data into customer and vehicle information
-            const customerUpdate = {
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                email: formData.email,
-                phoneNumber: formData.phoneNumber,
-                address: formData.address,
-                city: formData.city,
-                zipCode: formData.zipCode,
-                notes: formData.notes
-            };
-
-            const vehicleUpdate = {
-                customerId: id,
-                year: formData.year,
-                make: formData.make,
-                model: formData.model,
-                trim: formData.trim,
-                vin: formData.vin,
-                licensePlate: formData.licensePlate,
-                color: formData.color,
-                mileage: formData.mileage,
-                engine: formData.engine,
-                transmission: formData.transmission,
-                fuelType: formData.fuelType,
-                isAWD: formData.isAWD,
-                is4x4: formData.is4x4,
-                notes: formData.vehicleNotes
-            };
-
-            // Update customer
-            await axiosInstance.put(`/customers/${id}`, customerUpdate);
-
-            // Handle vehicle update/creation
-            try {
-                const vehiclesRes = await axiosInstance.get(`/customers/${id}/vehicles`);
-                if (vehiclesRes.data && vehiclesRes.data.length > 0) {
-                    await axiosInstance.put(`/vehicles/${vehiclesRes.data[0]._id}`, vehicleUpdate);
-                } else {
-                    await axiosInstance.post('/vehicles', vehicleUpdate);
-                }
-            } catch (vehicleError) {
-                console.error('Error updating vehicle:', vehicleError);
-                toast.warning('Customer updated but vehicle information may not have saved correctly');
-            }
-
-            toast.success('Customer information updated successfully');
-            navigate(`/customers/${id}`);
-
-        } catch (error) {
-            console.error('Error updating customer:', error);
-            toast.error(error.response?.data?.message || 'Error updating customer information');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="text-center text-red-500 mt-8">
-                <p>{error}</p>
-                <button 
-                    onClick={() => navigate('/customers')}
-                    className="mt-4 text-blue-500 hover:text-blue-400"
-                >
-                    Return to Customers
-                </button>
-            </div>
-        );
-    }
+    if (loading) return <div className="text-white text-center mt-8">Loading...</div>;
+    if (error) return <div className="text-red-500 text-center mt-8">{error}</div>;
 
     return (
-        <div className="max-w-2xl mx-auto p-4">
+        <div className="container mx-auto px-4 py-8">
             <h2 className="text-2xl font-bold text-white mb-6">Edit Customer</h2>
-            {customerData && (
-                <CustomerForm 
-                    customer={customerData}
-                    onSubmit={handleSubmit}
-                    isEditing={true}
-                />
-            )}
+            <NewCustomerForm 
+                initialData={customerData} 
+                onSuccess={() => {
+                    toast.success('Customer updated successfully');
+                    navigate(`/customers/${id}`);
+                }}
+                isEditing={true}
+            />
         </div>
     );
 };

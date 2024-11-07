@@ -17,6 +17,7 @@ import {
     FaHome
 } from 'react-icons/fa';
 // menu items needs to include the path for invoice, profile, HOME 
+// The log out feature and button need to work 
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     const location = useLocation();
@@ -30,11 +31,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         },
         { path: '/dashboard', label: 'Overview', icon: <FaChartLine className="w-5 h-5" /> },
         { path: '/appointments', label: 'Appointments', icon: <FaCalendarAlt className="w-5 h-5" /> },
-        { path: '/customers', label: 'Customers', icon: <FaUsers className="w-5 h-5" /> },
-        { path: '/vehicles', label: 'Vehicles', icon: <FaCar className="w-5 h-5" /> },
-        { path: '/service-records', label: 'Service Records', icon: <FaTools className="w-5 h-5" /> },
-        { path: '/parts', label: 'Parts Inventory', icon: <FaBoxes className="w-5 h-5" /> },
-        { path: '/technicians', label: 'Technicians', icon: <FaUserCog className="w-5 h-5" /> },
+        { path: '/customers', label: 'Customers', icon: <FaUsers className="w-5 h-5" /> },  
         { path: '/reports', label: 'Reports', icon: <FaChartBar className="w-5 h-5" /> },
         { path: '/invoice', label: 'Invoice', icon: <FaFileInvoice className="w-5 h-5" /> },
         { path: '/profile', label: 'Profile', icon: <FaUserCog className="w-5 h-5" /> },
@@ -57,7 +54,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             ${isSidebarOpen ? 'translate-x-0' : '-translate-x-56'}
             z-50
         `}>
-            <div className="h-full flex flex-col">
+            <div className="h-full  flex flex-col">
                 <button 
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     className="absolute -right-4 top-4 bg-gray-800 p-2 rounded-full"
@@ -69,7 +66,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                         <Link
                             key={item.path}
                             to={item.path}
-                            className={`flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors w-full max-w-[130px] ${
+                            className={`flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors w-full max-w-[100px] ${
                                 location.pathname === item.path ? 'bg-gray-700' : ''
                             }`}
                         >

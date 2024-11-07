@@ -35,10 +35,12 @@ import Sidebar from './components/layout/Sidebar';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { InvoiceProvider } from './context/InvoiceContext';
+
 function App() {
 	const { authUser } = useAuthContext();
 
 	return (
+		<>
 		<CustomerProvider>
 			<VehicleProvider>
 				<InvoiceProvider>
@@ -55,6 +57,7 @@ function App() {
 								element={
 									authUser ? (
 										<ShopDashboard>
+										<MessageContainer />
 											<Routes>
 												<Route path="/unified-dashboard" element={<UnifiedDashboard />} />
 												<Route path="/customers/*" element={<CustomerRoutes />} />
@@ -74,7 +77,7 @@ function App() {
 												<Route path="/dtc-query" element={<DTCQueryInterface />} />
 												<Route path="/" element={<Navigate to="/dashboard" replace />} />
 												<Route path="/customers/new" element={<NewCustomer />} />
-												<Route path="/customers/:id/edit" element={<EditCustomer />} />
+												<Route path="/customers/:id/edit" element={<Home />} />
 											</Routes>
 										</ShopDashboard>
 									) : (
@@ -100,6 +103,7 @@ function App() {
 				</InvoiceProvider>
 			</VehicleProvider>
 		</CustomerProvider>
+		</>
 	);
 }
 

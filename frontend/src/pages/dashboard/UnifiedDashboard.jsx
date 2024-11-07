@@ -48,10 +48,7 @@ const UnifiedDashboard = () => {
                 {/* Left Column */}
                 <Grid item xs={12} md={6}>
                     {/* Customer Search Section */}
-                    <div className="bg-gray-800 rounded-lg p-6 mb-6">
-                        <h2 className="text-xl font-bold text-white mb-4">Customer Search</h2>
-                        <CustomerSearch />
-                    </div>
+                  
 
                     {/* DTC Query Interface */}
                     <DTCQueryInterface />
@@ -60,7 +57,6 @@ const UnifiedDashboard = () => {
                 {/* Right Column */}
                 <Grid item xs={12} md={6}>
                     {/* Message Container */}
-                        <MessageContainer />
 
                     {/* Appointments Calendar */}
                     <div className="bg-gray-800 rounded-lg p-6">

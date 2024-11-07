@@ -13,7 +13,7 @@ const CustomerDetails = () => {
         const fetchCustomerData = async () => {
             try {
                 // Fetch customer details
-                const customerResponse = await axios.get(`/api/customers/${id}`);
+                const customerResponse = await axios.get(`/customers/${id}`);
                 setCustomer(customerResponse.data);
 
                 // Fetch customer's invoices

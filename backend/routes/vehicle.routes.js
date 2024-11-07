@@ -6,29 +6,30 @@ import {
     deleteVehicle, 
     getCustomerVehicles,
     getVehicleServiceHistory,
-    getAllVehicles
+    getAllVehicles,
+    getVehiclesByCustomerName
 } from '../controllers/vehicleController.js';
 import { verifyToken } from '../middleware/auth.middleware.js';
-
+import protectRoute from "../middleware/protectRoute.js";
+import Vehicle from "../models/vehicle.model.js";
 const router = express.Router();
 // Get all vehicles
-router.get('/', verifyToken, getAllVehicles);
+router.get('/', protectRoute, getAllVehicles);
 // Get all vehicles for a customer
-router.get('/customer/:customerId', verifyToken, getCustomerVehicles);
-
+router.get('/customer', protectRoute, getVehiclesByCustomerName);
 // Get single vehicle
-router.get('/:id', verifyToken, getVehicle);
+router.get('/:id', protectRoute, getVehicle);
 
 // Add new vehicle
-router.post('/', verifyToken, createVehicle);
+router.post('/', protectRoute, createVehicle);
 
 // Update vehicle
-router.put('/:id', verifyToken, updateVehicle);
+router.put('/:id', protectRoute, updateVehicle);
 
 // Delete vehicle
-router.delete('/:id', verifyToken, deleteVehicle);
+router.delete('/:id', protectRoute, deleteVehicle);
 
 // Get vehicle service history
-router.get('/:id/service-history', verifyToken, getVehicleServiceHistory);
+router.get('/:id/service-history', protectRoute, getVehicleServiceHistory);
 
 export default router; 

@@ -1,29 +1,34 @@
 import { useState } from 'react';
-import { useAuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import axios from '../utils/axios';
+import axios from 'axios';
+import { useAuthContext } from "../context/AuthContext";
 
 const useLogin = () => {
 	const [loading, setLoading] = useState(false);
-	const { setAuthUser } = useAuthContext();
 	const navigate = useNavigate();
+	const { setAuthUser } = useAuthContext();
 
 	const login = async (username, password) => {
+		setLoading(true);
 		try {
-			setLoading(true);
-			const { data } = await axios.post('/api/auth/login', {
+			const response = await axios.post('http://localhost:5000/api/auth/login', {
 				username,
 				password
 			});
 
-			localStorage.setItem('chat-user', JSON.stringify(data));
-			setAuthUser(data);
-			toast.success('Login successful!');
-			navigate('/dashboard');
+			if (response.data) {
+				localStorage.setItem('token', response.data.token);
+				localStorage.setItem('chat-user', JSON.stringify(response.data.user));
+				setAuthUser(response.data.user);
+				toast.success('Login successful!');
+				navigate('/dashboard');
+				return true;
+			}
 		} catch (error) {
-			toast.error(error.response?.data?.error || 'Login failed');
 			console.error('Login error:', error);
+			toast.error(error.response?.data?.error || 'Login failed');
+			return false;
 		} finally {
 			setLoading(false);
 		}

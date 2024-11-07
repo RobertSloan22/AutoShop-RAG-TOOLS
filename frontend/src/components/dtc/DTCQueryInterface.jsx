@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useEffect } from 'react';
 import { useVehicle } from '../../context/VehicleContext';
 import { toast } from 'react-hot-toast';
 import axiosInstance from '../../utils/axiosConfig';
@@ -41,12 +42,29 @@ const DTCQueryInterface = () => {
         }
         // Add more preset URLs here as needed
     ]);
+    const [customerSearch, setCustomerSearch] = useState({ firstName: '', lastName: '' });
     const fetchVehicles = async () => {
-        const vehicles = await axios.get('/api/vehicles/');
+        const vehicles = await axios.get('/api/vehicles');
         setVehicles(vehicles.data);
     };
-
-    
+// write the function use the GET /api/vehicles/customer?firstName=John&lastName=Doe to get vehicles by customer name 
+    const fetchVehiclesByCustomerName = async () => {
+        try {
+            const response = await axiosInstance.get(`/vehicles/customer`, {
+                params: {
+                    firstName: customerSearch.firstName,
+                    lastName: customerSearch.lastName
+                }
+            });
+            setVehicles(response.data);
+        } catch (error) {
+            console.error('Error fetching vehicles:', error);
+            toast.error('Failed to fetch vehicles');
+        }
+    };
+//then call the function in the useEffect hook 
+ 
+//impliment the userinterface for the function 
 
     const fetchInvoices = async () => {
         try {
@@ -59,33 +77,17 @@ const DTCQueryInterface = () => {
     };
     const fetchCustomers = async () => {
         try {
-            const response = await axiosInstance.get('/customers/search', {
-                params: { term: '' }  // Empty term to get all customers
-            });
-            
-            // Fetch vehicles for each customer
-            const customersWithVehicles = await Promise.all(
-                response.data.map(async (customer) => {
-                    try {
-                        const vehiclesRes = await axiosInstance.get(`/customers/${customer._id}/vehicles`);
-                        return {
-                            ...customer,
-                            vehicles: vehiclesRes.data
-                        };
-                    } catch (error) {
-                        console.error(`Error fetching vehicles for customer ${customer._id}:`, error);
-                        return {
-                            ...customer,
-                            vehicles: []
-                        };
-                    }
-                })
-            );
-            
-            setCustomers(customersWithVehicles);
+            const response = await axiosInstance.get('/api/customers/all');
+            if (Array.isArray(response.data)) {
+                setCustomers(response.data);
+            } else {
+                console.error('Expected array of customers but got:', response.data);
+                setCustomers([]);
+            }
         } catch (err) {
             toast.error('Failed to fetch customers');
             console.error('Error fetching customers:', err);
+            setCustomers([]);
         }
     };
 
@@ -302,7 +304,7 @@ const DTCQueryInterface = () => {
 
 
         <Grid item xs={12}>
-        <div className="flex-1  w-[50vw] font-bold text-white bg-gray-900 bg-opacity-75 backdrop-blur-md rounded-lg shadow-lg p-4">
+        <div className="flex-1 w-[50vw] font-bold text-white bg-gray-900 bg-opacity-75 backdrop-blur-md rounded-lg shadow-lg p-4">
             <h2 className="text-xl font-bold mb-4 text-white">Vehicle DTC Code Query</h2>
             
             {/* Display current vehicle info */}
@@ -531,6 +533,79 @@ const DTCQueryInterface = () => {
                         </div>
                         <button
                             onClick={() => setShowAppointmentModal(false)}
+                            className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                    <div className="flex gap-2">
+                        <button onClick={fetchVehiclesByCustomerName} className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500">
+                            Fetch Vehicles by Customer Name
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {showCustomerModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                    <div className="bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                        <h3 className="text-xl font-bold text-white mb-4">Select Customer</h3>
+                        
+                        {/* Search Form */}
+                        <div className="mb-4">
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                <input
+                                    type="text"
+                                    placeholder="First Name"
+                                    value={customerSearch.firstName}
+                                    onChange={(e) => setCustomerSearch(prev => ({ ...prev, firstName: e.target.value }))}
+                                    className="w-full p-2 bg-gray-700 text-white rounded"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Last Name"
+                                    value={customerSearch.lastName}
+                                    onChange={(e) => setCustomerSearch(prev => ({ ...prev, lastName: e.target.value }))}
+                                    className="w-full p-2 bg-gray-700 text-white rounded"
+                                />
+                            </div>
+                            <button
+                                onClick={fetchVehiclesByCustomerName}
+                                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            >
+                                Search
+                            </button>
+                        </div>
+
+                        {/* Customers List */}
+                        <div className="space-y-4">
+                            {customers.length === 0 ? (
+                                <p className="text-gray-400 text-center">No customers found</p>
+                            ) : (
+                                customers.map((customer) => (
+                                    <div
+                                        key={customer._id}
+                                        onClick={() => handleSelectCustomer(customer)}
+                                        className="p-4 bg-gray-700 rounded cursor-pointer hover:bg-gray-600"
+                                    >
+                                        <p className="text-white font-medium">
+                                            {customer.firstName} {customer.lastName}
+                                        </p>
+                                        <p className="text-sm text-gray-300">
+                                            {customer.email} | {customer.phoneNumber}
+                                        </p>
+                                        {customer.vehicles && customer.vehicles.length > 0 && (
+                                            <p className="text-sm text-gray-400 mt-1">
+                                                Vehicles: {customer.vehicles.length}
+                                            </p>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        <button
+                            onClick={() => setShowCustomerModal(false)}
                             className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
                         >
                             Cancel

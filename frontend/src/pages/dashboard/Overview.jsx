@@ -2,18 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosConfig';
 import { format } from 'date-fns';
-import Navbar from '../../components/navbar/Navbar';
-import Sidebar from '../../components/layout/Sidebar';
+
 //import all components needed for the chat feature
 import MessageContainer from "../../components/messages/MessageContainer";
 import { Link } from "react-router-dom";
-import Invoice from "../invoice/Invoice.jsx"
-import Appointments from "../../components/appointments/Appointments";
-import InvoiceModal from "../../components/invoice/InvoiceModal";
-import CustomerSearch from "../../components/customers/CustomerSearch";
-import DTCQueryInterface from "../../components/dtc/DTCQueryInterface";
-import AppointmentList from "../../components/appointments/AppointmentsList";
-import AppointmentDetailsModal from "../../components/appointments/AppointmentDetailsModal";
+
 import InvoiceList from "../invoice/InvoicList";
 //import the message container
 
@@ -27,7 +20,7 @@ const Overview = () => {
         const fetchDashboardData = async () => {
             try {
                 // Fetch appointments
-                const { data } = await axiosInstance.get('/api/appointments');
+                const { data } = await axiosInstance.get('/appointments');
                 console.log('Raw appointments from API:', data);
                 
                 // Format appointments like in Appointments.jsx
@@ -56,7 +49,7 @@ const Overview = () => {
                 setAppointments(todaysAppointments);
 
                 // Fetch recent invoices
-                const { data: invoiceData } = await axiosInstance.get('/api/invoices/recent');
+                const { data: invoiceData } = await axiosInstance.get('/invoices/recent');
                 console.log('Raw invoices from API:', invoiceData);
                 console.log('Invoice data type:', typeof invoiceData);
                 console.log('Is array?', Array.isArray(invoiceData));

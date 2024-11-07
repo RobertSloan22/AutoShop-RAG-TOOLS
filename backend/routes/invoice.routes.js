@@ -5,7 +5,8 @@ import {
     getInvoiceById, 
     updateInvoice, 
     deleteInvoice,
-    getInvoicesByCustomer 
+    getInvoicesByCustomer, 
+    getRecentInvoices
 } from "../controllers/invoice.controller.js";
 import protectRoute from "../middleware/protectRoute.js";
 import Invoice from "../models/invoice.model.js";

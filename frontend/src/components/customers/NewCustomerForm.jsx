@@ -1,14 +1,13 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosConfig';
-import { toast } from 'react-toastify';
-import { vehicleOptions, engineOptions, colorOptions } from '../../config/vehicleOptions';
+import { toast } from 'react-hot-toast';
+import { vehicleOptions, engineOptions, colorOptions } from '../../utils/vehicleOptions';
 
-const NewCustomerForm = ({ onSuccess }) => {
+const NewCustomerForm = ({ onSuccess, initialData = {}, isEditing = false }) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        // Customer Information
         firstName: '',
         lastName: '',
         email: '',
@@ -16,8 +15,7 @@ const NewCustomerForm = ({ onSuccess }) => {
         address: '',
         city: '',
         zipCode: '',
-        
-        // Vehicle Information
+        notes: '',
         year: '',
         make: '',
         model: '',
@@ -31,8 +29,19 @@ const NewCustomerForm = ({ onSuccess }) => {
         fuelType: '',
         isAWD: false,
         is4x4: false,
-        notes: ''
+        vehicleNotes: ''
     });
+
+    useEffect(() => {
+        if (initialData && Object.keys(initialData).length > 0) {
+            console.log('Setting initial form data:', initialData);
+            setFormData(prev => ({
+                ...prev,
+                ...initialData,
+                vehicleNotes: initialData.notes || ''
+            }));
+        }
+    }, [initialData]);
 
     const handleChange = (e) => {
         const { name, type, checked, value } = e.target;
@@ -45,47 +54,55 @@ const NewCustomerForm = ({ onSuccess }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        
+
         try {
-            const customerResponse = await axiosInstance.post('/customers', {
+            const customerData = {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,
                 phoneNumber: formData.phoneNumber,
                 address: formData.address,
                 city: formData.city,
-                zipCode: formData.zipCode
-            });
+                zipCode: formData.zipCode,
+                notes: formData.notes
+            };
 
-            const vehicleResponse = await axiosInstance.post('/vehicles', {
-                customerId: customerResponse.data._id,
-                year: parseInt(formData.year),
+            const vehicleData = {
+                _id: initialData._id,
+                year: formData.year,
                 make: formData.make,
                 model: formData.model,
                 trim: formData.trim,
                 vin: formData.vin,
                 licensePlate: formData.licensePlate,
                 color: formData.color,
-                mileage: parseInt(formData.mileage),
+                mileage: formData.mileage,
                 engine: formData.engine,
                 transmission: formData.transmission,
                 fuelType: formData.fuelType,
                 isAWD: formData.isAWD,
                 is4x4: formData.is4x4,
-                notes: formData.notes
-            });
+                notes: formData.vehicleNotes
+            };
 
-            toast.success('Customer and vehicle created successfully!');
-            if (onSuccess) {
-                onSuccess({ ...customerResponse.data, vehicle: vehicleResponse.data });
+            if (isEditing) {
+                await axiosInstance.put(`/customers/${initialData._id}`, {
+                    customerData,
+                    vehicleData
+                });
+            } else {
+                const response = await axiosInstance.post('/customers', {
+                    customerData,
+                    vehicleData
+                });
             }
-            navigate(`/customers/${customerResponse.data._id}`);
+
+            if (onSuccess) {
+                onSuccess();
+            }
         } catch (error) {
-            console.error('Error creating customer:', error);
-            const errorMessage = error.response?.data?.error || 
-                               error.response?.data?.details || 
-                               'Error creating customer';
-            toast.error(errorMessage);
+            console.error('Error submitting form:', error);
+            toast.error(error.response?.data?.error || 'Error saving customer');
         } finally {
             setLoading(false);
         }

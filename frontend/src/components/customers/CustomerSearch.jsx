@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import axiosInstance from '../../utils/axiosConfig';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +10,6 @@ const CustomerSearch = ({ onCustomerSelect }) => {
     const [loading, setLoading] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
-    const navigate = useNavigate();
 
     const handleSearch = async (value) => {
         setSearchTerm(value);
@@ -22,7 +20,7 @@ const CustomerSearch = ({ onCustomerSelect }) => {
 
         setLoading(true);
         try {
-            const response = await axios.get(`/api/customers/search`, {
+            const response = await axiosInstance.get(`/customers/search`, {
                 params: { term: value }
             });
             setSearchResults(response.data);

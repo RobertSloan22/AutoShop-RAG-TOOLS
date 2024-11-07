@@ -8,6 +8,7 @@ const CustomerDetailsModal = ({ customer, onClose, onEdit }) => {
 
     const handleEdit = () => {
         navigate(`/customers/${customer._id}/edit`);
+        
         onClose();
     };
 
@@ -57,6 +58,12 @@ const CustomerDetailsModal = ({ customer, onClose, onEdit }) => {
                         <div>
                             <label className="text-gray-400">Zip Code</label>
                             <p className="text-white">{customer.zipCode || 'Not provided'}</p>
+                        </div>
+                        <div>
+                            <label className="text-gray-400">Vehicle</label>
+                            <p className="text-white">
+                                {customer.vehicles && customer.vehicles.length > 0 ? `${customer.vehicles[0].year} ${customer.vehicles[0].make} ${customer.vehicles[0].model}` : 'Not provided'}
+                            </p>
                         </div>
                     </div>
 

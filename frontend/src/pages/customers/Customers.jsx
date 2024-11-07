@@ -4,7 +4,7 @@ import axios from '../../utils/axiosConfig';
 import NewCustomerForm from '../../components/customers/NewCustomerForm';
 import Invoice from '../invoice/Invoice';
 import Appointment from '../appointments/AppointmentList';
-
+import NewCustomer from '../../components/customers/NewCustomer';
 
 const Customers = () => {
     const [customers, setCustomers] = useState([]);
@@ -18,7 +18,7 @@ const Customers = () => {
 
     const fetchCustomers = async () => {
         try {
-            const response = await axios.get('/api/customers');
+            const response = await axios.get('/customers');
             setCustomers(response.data);
         } catch (error) {
             console.error('Error fetching customers:', error);
@@ -33,6 +33,7 @@ const Customers = () => {
 
     return (
         <>
+        <NewCustomer />
         <div className="container mx-auto px-4 py-8">
             {/* Header with Add Customer Button */}
             <div className="flex justify-between items-center mb-6">

@@ -8,13 +8,15 @@ import { useNavigate } from 'react-router-dom';
 import CustomerForm from '../../components/customers/CustomerForm';
 import EditCustomer from '../../components/customers/EditCustomer';
 import Overview from '../dashboard/Overview';
-
+import NewCustomer from '../../components/customers/NewCustomer';
+import CustomerDetails from './CustomerDetails';
 const CustomersPage = ({ children }) => {
     const { invoices, loading } = useInvoice();
     const activeInvoices = invoices.filter(invoice => invoice.status === 'active');
 
     return (
         <>
+       
          <div className="bg-gray-800 rounded-lg p-6">
 
         </div>
@@ -36,7 +38,6 @@ const CustomersPage = ({ children }) => {
         </div>
         <div className="bg-gray-800 rounded-lg p-6">
      
-        <EditCustomer />
         <CustomerForm />
         </div>
         </>

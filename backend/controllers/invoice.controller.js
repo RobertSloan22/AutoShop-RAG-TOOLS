@@ -141,3 +141,17 @@ export const getInvoicesByCustomer = async (req, res) => {
         res.status(500).json({ error: "Error fetching customer invoices" });
     }
 };
+
+
+export const getRecentInvoices = async (req, res) => {
+    try {
+        const recentInvoices = await Invoice.find()
+            .sort({ date: -1 })
+            .limit(5);  // Adjust limit as needed
+        
+        res.status(200).json(recentInvoices);
+    } catch (error) {
+        console.error('Error fetching recent invoices:', error);
+        res.status(500).json({ error: 'Failed to fetch recent invoices' });
+    }
+};

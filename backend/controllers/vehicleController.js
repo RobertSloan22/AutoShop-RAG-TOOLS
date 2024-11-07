@@ -1,7 +1,17 @@
 import Vehicle from '../models/vehicle.model.js';
+import Customer from '../models/customer.model.js';
 
 export const createVehicle = async (req, res) => {
     try {
+        if (!req.body.customerId) {
+            return res.status(400).json({ error: 'Customer ID is required' });
+        }
+
+        const customer = await Customer.findById(req.body.customerId);
+        if (!customer) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+
         const vehicleData = {
             customerId: req.body.customerId,
             year: req.body.year,
@@ -41,7 +51,15 @@ export const getAllVehicles = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
-
+// add a route to get all vehicles for a customer by customer name 
+export const getAllVehiclesForCustomer = async (req, res) => {
+    try {
+        const vehicles = await Vehicle.find({ customerId: req.params.customerId });
+        res.json(vehicles);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
 
 export const getVehicle = async (req, res) => {
     try {
@@ -105,6 +123,34 @@ export const getVehicleServiceHistory = async (req, res) => {
         }
         
         res.json(vehicle.maintenanceHistory);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+export const getVehiclesByCustomerName = async (req, res) => {
+    try {
+        const { firstName, lastName } = req.query;
+        
+        // Find customers matching the name
+        const customers = await Customer.find({
+            firstName: new RegExp(firstName, 'i'),
+            lastName: new RegExp(lastName, 'i')
+        });
+
+        if (!customers.length) {
+            return res.status(404).json({ error: 'No customers found with that name' });
+        }
+
+        // Get customer IDs
+        const customerIds = customers.map(customer => customer._id);
+
+        // Find vehicles for these customers
+        const vehicles = await Vehicle.find({
+            customerId: { $in: customerIds }
+        }).populate('customerId', 'firstName lastName');
+
+        res.json(vehicles);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
